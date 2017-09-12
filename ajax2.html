@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Document</title>
+<style type="text/css">
+.red{
+border: 1px solid red;
+}	
+.green{
+border: 1px solid green;
+}
+</style>
+</head>
+<body>
+
+用户名：<input type="text" id="user"/><span id="span"></span>
+
+<script src="jquery-3.2.1.min.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+
+//ajax	
+//只是一种获取动态数据的一种技术手段 --> 获取数据的方法
+
+var user = document.getElementById('user');
+var span = document.getElementById('span');
+
+/*user.onblur = function(){	
+	const ajax = new XMLHttpRequest;
+	ajax.open('get','php/get_json.php?user='+user.value);
+	ajax.send();
+	ajax.onload = function(){
+		var data = JSON.parse(ajax.responseText);
+		if(data.code){
+			user.className = 'red';
+		}else{
+			user.className = 'green';
+		}
+		span.innerHTML = data.msg;
+	}
+}*/
+
+
+// jQuery版
+$('#user').blur( function(){
+
+	$.ajax( {
+		url:'php/get_json.php',
+		data:{
+			user:$('#user').val()
+		},
+		dataType:'json',//json -> obj
+		success:function(data){
+			$('#span').text(data.msg);
+		}		
+	} );
+
+} );
+
+</script>
+
+</body>
+</html>
