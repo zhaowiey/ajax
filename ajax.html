@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Document</title>
+</head>
+<body>
+
+用户名：<input type="text" name="user" id="user"/><span id="span"></span>
+
+<script type="text/javascript">
+/*
+$.ajax({
+	url:'后端接口地址',
+	data:{
+		拼接的字段:需要拼接的数据（前端传给后端的数据）
+	},
+	dataType:'json',//json -> obj
+	//当服务器处理完之后返回的结果(str)。
+	success:function(data){//回调。
+		console.log(data);
+	}
+})
+
+*/
+
+/*  ajax原理  */
+var user = document.getElementById('user');
+var span = document.getElementById('span');
+user.onblur = function(){
+	//1.创建一个ajax对象
+	var ajax = new XMLHttpRequest(); 
+	//2.填写请求地址
+	/*
+		method:使用什么方式请求 get post
+		url:请求的地址
+		boolean：是否异步（默认为true异步）	
+	*/
+	ajax.open('get','php/get.php?user='+user.value);
+
+	//3.发送请求
+	ajax.send();
+
+	//4.等待服务器响应
+	//span.innerHTML = ajax.responseText;
+	ajax.onload = function(){
+		//ajax.responseText：后端处理完成之后返回的数据
+		//5.处理返回的数据
+		span.innerHTML = ajax.responseText;
+	}
+}
+</script>
+</body>
+</html>
