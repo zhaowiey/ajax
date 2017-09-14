@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+<script type="text/javascript">
+/*
+浏览器缓存:		
+	通过浏览器的url访问的地址，只要每次访问就会把这个地址，
+	给缓存下来，以便下次访问直接就走缓存,下一次访问同一个地址的
+	时候不会再进行HTTP请求了，大大减少了服务器的压力。
+	
+	有些时候后端改的东西因为有缓存机制，所以再次刷新页面的时候依然显示之前的内容。
+
+解决：
+	只要不是同一个地址就OK
+	.jpg?32312dsadsa
+*/
+
+
+/*
+
+ajax.status就是专门用查看HTTP状态码值的。
+
+1,2,3,4,5字开头.
+
+2 成功 3 重定向 4 文件错误 5 服务器错误
+
+成功的范围：
+	status >= 200 && status < 300 || status === 304
+
+*/
+
+
+/*
+
+IE9以下浏览器是不会触发onload的。
+			
+但是在所有的浏览器都支持onreadystatechange
+	
+当服务器进行响应的时候，每完成一个步骤就会触发这个事件。
+
+从发送到服务器处理完成一共有5个步骤
+
+每个步骤都是用数字来表示。
+
+0-4   ajax.readyState
+
+只不过0是监控不到的。
+
+不管它进行到几，只要到了数字4说明服务器接收并响应就绪。
+
+*/
+
+
+/*
+
+XMLHttpRequest 对象的三个重要的属性：	
+	1.监听事件
+		onreadystatechange
+	2.执行的步骤
+		ajax.readyState
+	3.状态码
+		ajax.status
+		
+onreadystatechange放在send的前面与后面的区别？
+	能多监听一步而已,其实能不能监听到意义不大，因为，只有数字4才算请求响应完毕。
+
+*/
+
+
+/*
+
+JSON.parse( json )  
+兼容
+
+eval()  
+安全
+
+new Function('a,b','return alert(a+b)')(1,2)  
+性能
+
+*/
+
+
+</script>	
+</body>
+</html>
