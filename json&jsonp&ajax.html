@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Document</title>
+</head>
+<body>
+<script type="text/javascript">
+/*
+1
+ajax的两个问题
+　　1.ajax以何种格式来交换数据
+　　2.跨域的需求如何解决
+　　　　数据跨域用自定义字符串或者用XML来描述
+　　　　跨域可以用服务器代理来解决
+2    
+jsonp来跨域
+　　json是一种数据交换格式 “暗号”	描述信息格式
+　　jsonp是非官方跨域数据交互协议	“接头方式”	信息传递双方约定的方法
+
+　　json是基于文本的数据交换方式或者数据描述格式
+　　　　json的优点
+　　　　　　1.基于纯文本，跨平台传递极其简单；
+　　　　　　2.javascript原生支持，后台语言几乎全部支持
+　　　　　　3.轻量级数据格式，占用字符数量极小，特别适合互联网传递
+　　　　　　4.可读性比较强，不必xml那么一目了然但在合理的依次缩进之后很容易识别
+　　　　　　5.容易编写和解析，当然前提是知道数据结构
+　　　　json的格式或者规则
+　　　　　　json以非常简单的方式来描述数据结构 xml能做的它都能做
+　　　　　　1.json的数据两种数据类型 大括号{}和方括号[] 其余英文冒号,是分隔符 冒号:是映射符 英文双引号""是定义符
+　　　　　　2.{}是描述一组 不同类型的无序键值对集合 每个键值对理解为OOP的属性描述
+　　　　　　    []是描述一组 相同类型的有序数据的集合 对应OPP的数组
+　　　　　　3.{}不同类型无序键值对和[]相同类型有序集合中有有多个子项，通过英文逗号分隔
+　　　　　　4.键值对以英文冒号:分隔并且建议键名都加英文双引号""，以便不同语言的解析
+　　　　　　5.json内部常用数据类型是字符串(必须用双引号引起来其他不用) 数字 布尔 日期 null 
+*/
+
+var person = { //一个人的描述
+    "name":"Bob",
+    "Age":32,
+    "Company":"IBM",
+    "Engineer":true
+}  
+var personAge = person.Age;
+var conference = {        //描述一次会议
+"Conference": "Future Marketing",
+"Date": "2012-6-1",
+"Address": "Beijing",
+"Members":
+    [
+        {
+            "Name": "Bob",
+            "Age": 32,
+            "Company": "IBM",
+            "Engineer": true
+        },
+        {
+            "Name": "John",
+            "Age": 20,
+            "Company": "Oracle",
+            "Engineer": false
+        },
+        {
+            "Name": "Henry",
+            "Age": 45,
+            "Company": "Microsoft",
+            "Engineer": false
+        }
+    ]
+}
+var henryIsAnEngineer = conference.Members[2].Engineer;// 读取参会者Henry是否工程师
+
+/*
+jsonp的产生原因
+
+　　1.Ajax直接请求普通文件存在跨域无权限访问的问题（静态页、动态页、web服务、wcf只要是跨域请求一律不准）
+　　2.web的页面上调用js文件是不受跨域的影响（凡拥有src属性的标签都拥有跨域能力script img iframe）
+　　3.可以判断 现在想通过纯web端(ActiveX控件、服务端代理、H5之Websocket等方式不算)跨域访问数据就只有一种可能，就是在远程服务器上设法把数据装进js格式的文件里，供客户端调用和进一步处理
+　　4.json的纯字符数格式可以简洁的描述复杂数据还被js原生支持
+　　5.web客户端通过与调用脚本一样的方式来调用跨域服务器上动态生成的js格式文件(后缀.json)，服务器之所以要动态生成json文件目的把客户端需要的数据装入进去
+　　6.客户端在对json文件调用成功后获得自己所需的数据剩下的就按照自己需求进行处理和展现，这种获取远程数据的方式非常像ajax其实并不一样
+　　7.为了方便客户端使用数据逐渐形成非正式传输协议jsonp
+　　　　该协议的一个要点就是允许用户传递一个callback参数给服务端，然后服务端返回数据时会将这个callback参数作为函数名来包裹住json数据 这样客户端就可以随意定制自己的函数来自动处理返回数据
+*/
+
+
+/*
+script
+
+var flightHandler = function (data) {
+    alert('您查到的信息：票价' + data.price + '元，余票' + data.tickets + '张。');
+};
+var url = "https://www.baidu.com/jsonp/flightResult.aspx?code=1991&callback=flightHandler";
+var script = document.createElement('script');
+    script.setAttribute('scr',url);
+document.getElementsByTagName('head')[0].appendChild(script);
+
+/script
+*/
+
+
+/*
+	jQuery如何实现jsonp调用
+*/
+
+$(document).ready(function () {
+    $.ajax({
+        type: "get",
+        url: "https://www.baidu.com/jsonp/flightResult.aspx?code=1991&callback=flightHandler",
+        dataType: "jsonp",
+        jsonp: "callback",//传递给请求处理程序或页面的，用以获得jsonp回调函数名的参数名(一般默认为:callback)
+        jsonpCallback: "flightHandler",//自定义的jsonp回调函数名称，默认为jQuery自动生成的随机函数名，也可以写"?"，jQuery会自动为你处理数据
+        success: function(json) {
+            alert('您查询到航班信息：票价： ' + json.price + ' 元，余票： ' + json.tickets + ' 张。');
+        },
+        error: function() {
+            alert("error");
+        }
+    });
+});
+
+/*
+ajax和jsonp的核心、区别
+　　1.ajax和jsonp的调用方式很像，目的一样，都是请求url，然后把服务器返回的数据进行处理，因此jquery和ext等框架都把jsonp作为ajax的一种形式进行了封装；
+　　2.实质不同
+　　　　ajax的核心是通过xmlHttpRequest获取非本页内容
+　　　　jsonp的核心是动态添加script标签调用服务器提供的js脚本
+　　3.区别联系
+　　　　不在于是否跨域
+　　　　ajax通过服务端代理一样跨域
+　　　　jsonp也并不排斥同域的数据的获取
+　　4.jsonp是一种方式或者说非强制性的协议
+　　　ajax也不一定非要用json格式来传递数据
+*/
+
+
+</script>
+</body>
+</html>
