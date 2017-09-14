@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+	<meta charset="UTF-8" />
+	<title>Document</title>
+</head>
+<body>
+<script type="text/javascript">
+	/*
+		一些跨域标签
+		
+			link  src="" 专门解析图片
+			img src=""  专门解析图片
+			script src=""  专门解析js的。
+			文件是什么内容不是由后缀名决定的，而是内容决定的。
+			script会尽可能的解析js相关的代码。
+
+			jsonp实现:
+				1、
+					***首先数据必须要为一个函数名加括号的数据
+					fn([{},{},{}]); 
+				2、
+					需要在***全局***下声明一个与数据的函数名一致的函数。
+					function fn(){}  //能找到
+				3、
+					想在哪里使用就创建一个srcipt标签，src等于数据的地址即可	
+	*/	
+</script>
+<script type="text/javascript">	
+	function fn(data){
+		console.log(data);
+	}
+
+	const btn = document.getElementById('btn');
+	
+	btn.onclick = function(){
+		const oS = document.createElement('script');
+		oS.src = 'http://localhost/2017-8-3/php/qq.js';
+		document.getElementsByTagName('head')[0].appendChild(oS);
+	}
+
+	/*
+	
+	qq.js
+		var c = [1,2,3,4];
+		fn(c);
+		//console.log( [1,2,3,4] )
+		
+	 */
+
+</script>
+</body>
+</html>
