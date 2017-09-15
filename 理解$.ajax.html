@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+<script type="text/javascript">
+/*
+version 1.5 之前
+	
+	var ajax = $.ajax({
+	    url: 'data.json',
+	    success: function () {
+	        console.log('success')
+	    },
+	    error: function () {
+	        console.log('error')
+	    }
+	})
+
+	console.log(ajax) // 返回一个 XHR 对象
+
+version 1.5 之后
+	
+	var ajax = $.ajax('data.json')
+	ajax.done(function () {
+	        console.log('success 1')
+	    }).fail(function () {
+	        console.log('error')
+	    }).done(function () {
+	         console.log('success 2')
+	    });
+
+	console.log(ajax) // 返回一个 deferred 对象
+
+*** JS 是异步执行的语言，但是人的思维是同步的
+*** 使用逻辑上看似同步的代码来完成 JS 的异步请求
+*** 更新产生了done fail
+
+	var ajax = $.ajax('data.json')
+	ajax.then(function () {
+	        console.log('success 1')
+	    }, function () {
+	        console.log('error 1')
+	    }).then(function () {
+	        console.log('success 2')
+	    }, function () {
+	        console.log('error 2')
+	    })
+
+	and then ** 
+	以及可以看出promise的影子
+
+实质
+	对异步操作的callback进行了封装
+
+
+
+*/
+
+/*
+Promise
+
+const wait =  function () {
+    // 定义一个 promise 对象
+    const promise = new Promise((resolve, reject) => {
+        // 将之前的异步操作，包括到这个 new Promise 函数之内
+        const task = function () {
+            console.log('执行完成')
+            resolve()  // callback 中去执行 resolve 或者 reject
+        }
+        setTimeout(task, 2000)
+    })
+    // 返回 promise 对象
+    return promise;
+}
+
+const w = wait()
+w.then(() => {
+    console.log('ok 1')
+}, () => {
+    console.log('err 1')
+}).then(() => {
+    console.log('ok 2')
+}, () => {
+    console.log('err 2')
+});
+
+在若干个then串联之后，我们一般会在最后跟一个.catch来捕获异常，而且执行reject时传递的参数也会在catch中获取到。
+
+读取两个文件data1.json和data2.json，现在我需要一起读取这两个文件，等待它们全部都被读取完，再做下一步的操作。此时需要用到Promise.all
+
+	// Promise.all 接收一个包含多个 promise 对象的数组
+	Promise.all([result1, result2]).then(datas => {
+	    // 接收到的 datas 是一个数组，依次包含了多个 promise 返回的内容
+	    console.log(datas[0])
+	    console.log(datas[1])
+	})
+
+读取两个文件data1.json和data2.json，现在我需要一起读取这两个文件，但是只要有一个已经读取了，就可以进行下一步的操作。此时需要用到Promise.race
+	
+	// Promise.race 接收一个包含多个 promise 对象的数组
+	Promise.race([result1, result2]).then(data => {
+	    // data 即最先执行完成的 promise 的返回值
+	    console.log(data)
+	})
+
+ and Generator & async-await ......
+
+
+*/
+
+</script>
+</body>
+</html>
