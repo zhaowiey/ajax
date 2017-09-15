@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<head>
+<meta charset="UTF-8">
+<title>异步编程四种方式</title>
+
+<style type="text/css">
+	
+div{
+	width: 800px;
+	background-color: #ccc;
+	margin:10px;
+}
+
+</style>
+<script type="text/javascript">
+/*
+异步
+	发起一个网络请求，就先不管这边了，先干其他事儿，网络请求啥时候返回结果，到时候再说。这样就能保证一个网页的流程运行。
+
+实现原理
+	$.ajax({
+	    url: '/data/data1.json',
+	    success: function () {
+	        console.log('success')
+	    }
+	})
+
+	success函数传递过去不会立即执行，而是等着请求成功之后才能执行。对于这种传递过去不执行，等出来结果之后再执行的函数，叫做callback，即回调函数。
+
+	实现异步的最核心原理，就是将callback作为参数传递给异步执行函数，当有结果返回之后再触发 callback执行
+
+常用异步操作
+	网络请求，如ajax http.get
+	IO 操作，如readFile readdir
+	定时函数，setTimeout setInterval
+*/
+</script>
+</head>
+<body>
+
+<h4>JavaScript 异步编程的四种方式</h4>
+<p>
+	异步编程是每个使用 JavaScript 编程的人都会遇到的问题，无论是前端的 ajax 请求，或是 node 的各种异步 API。本文就来总结一下常见的四种处理异步编程的方法。
+</p>
+
+<h3>回调函数</h3>
+
+<p>
+	使用回调函数是最常见的一种形式，下面来举几个例子：
+</p>
+
+<div>
+	// jQuery ajax<br/>
+	$.get('test.html', data => {<br/>
+	  $('#result').html(data)<br/>
+	})<br/>
+</div>
+
+<div>
+	// node 异步读取文件<br/>
+	const fs = require('fs')<br/>
+	fs.readFile('/etc/passwd', (err, data) => {<br/>
+	  if (err) {<br/>
+	    throw err<br/>
+	  }<br/>
+	  console.log(data)<br/>
+	})<br/>
+</div>
+
+<p>
+	回调函数非常容易理解，就是定义函数的时候将另一个函数（回调函数）作为参数传入定义的函数当中，当异步操作执行完毕后在执行该回调函数，从而可以确保接下来的操作在异步操作之后执行。
+	<br/><br/>
+	回调函数的缺点在于当需要执行多个异步操作的时候会将多个回调函数嵌套在一起，组成代码结构上混乱，被称为回调地狱（callback hell）。
+</p>
+
+<div>
+	func1(data0, data1 => {<br/>
+	  func2(data2, data3 => {<br/>
+	    func3(data3, data4 => data4)<br/>
+	  })<br/>
+	})<br/>
+</div>
+
+<h3>Promise</h3>
+
+<p>
+	Promise 利用一种链式调用的方法来组织异步代码，可以将原来以回调函数形式调用的代码改为链式调用。
+</p>
+
+<div>
+	// jQuery ajax promise 方式<br/>
+	$.get('test.html')<br/>
+	  .then(data => $(data))<br/>
+	  .then($data => $data.find('#link').val('href'))<br/>
+	  .then(href => console.log(href))<br/>
+</div>
+
+<p>
+	自己定义一个 Promise 形式的函数在 ES6 当中也非常简单：
+</p>
+
+<div>
+	function ready() {<br/>
+	  return new Promise((resolve, reject) => {<br/>
+	    setTimeout(() => {<br/>
+	      resolve('ready')<br/>
+	    }, 3000)<br/>
+	  })<br/>
+	}<br/>
+	ready().then(ready => console.log(`${ready} go!`))<br/>
+</div>
+
+<p>
+	在 node 8.0 以上的版本还可以利用 util.promisify 方法将回调形式的函数变为 Promise 形式。
+</p>
+
+<div>
+	const util = require('util')<br/>
+	const fs = require('fs')<br/>
+	const readPromise = util.promisify(fs.readFile)<br/>
+	readPromise('test.txt').then(data => console.log(data.toString()))<br/>
+</div>
+
+<p>
+	想详细了解 Promise 可以阅读拙作谈谈 ES6 的 Promise 对象。
+</p>
+
+<h3>Generators</h3>
+
+<p>
+	node 的著名开发者 TJ 利用 ES6 新特性生成器（Generators）开发了一个异步控制工具 co。
+</p>
+
+<p>
+	利用 co 可以将异步代码的写法写成类似同步代码的形式：
+</p>
+
+<div>
+	const util = require('util')<br/>
+	const fs = require('fs')<br/>
+	const co = require('co')<br/>
+	const readFile = util.promisify(fs.readFile)<br/>
+	co(function* () {<br/>
+	  const txt = yield readFile('file1.txt', 'utf8')<br/>
+	  console.log(txt)<br/>
+	  const txt2 = yield readFile('file2.txt', 'utf8')<br/>
+	  console.log(txt2)<br/>
+	})<br/>
+</div>
+
+<p>
+	使用 Generators 的好似显然易见，可以使异步代码写得非常清晰，缺点就是要另外引入相关的库来利用该特性。
+</p>
+
+<h3>Async/Await</h3>
+
+<p>
+node7.6 以上的版本引入了一个 ES7 的新特性 Async/Await 是专门用于控制异步代码。先看一个例子：
+</p>
+
+<div>
+	const util = require('util')<br/>
+	const fs = require('fs')<br/>
+	const readFile = util.promisify(fs.readFile)<br/>
+	async function readFiles () {<br/>
+	  const txt = await readFile('file1.txt', 'utf8')<br/>
+	  console.log(txt)<br/>
+	  const txt2 = await readFile('file2.txt', 'utf8')<br/>
+	  console.log(txt2)<br/>
+	})<br/>
+</div>
+
+<p>
+	首先要使用 async 关键字定义一个包含异步代码的函数，在 Promise 形式的异步函数前面使用 await 关键字就可以将异步写成同步操作的形式。
+</p>
+
+<p>
+	看上去与 Generators 控制方式相差不大，但是 Async/Await 是原生用于控制异步，所以是比较推荐使用的。
+</p>
+
+<h3>错误处理</h3>
+
+<p>
+	四种异步控制方法的错误处理。
+</p>
+
+<p>
+	回调函数错误处理非常简单，就是在回调函数中同时回传错误信息：
+</p>
+
+<div>
+	const fs = require('fs')<br/>
+	fs.readFile('file.txt', (err, data) => {<br/>
+	  if (err) {<br/>
+	    throw err<br/>
+	  }<br/>
+	  console.log(data)<br/>
+	})<br/>
+</div>
+
+<p>
+	Promise 在 then 方法之后使用一个 catch 方案来捕捉错误信息：
+</p>
+
+<div>
+	const fs = require('fs')<br/>
+	const readFile = util.promisify(fs.readFile)<br/>
+	readFile('file.txt')<br/>
+	  .then(data => console.log(data))<br/>
+	  .catch(err => console.log(err))<br/>
+</div>
+
+<p>
+	Generators 和 Async/Await 比较类似，可以有两种方式，第一种使用 Promise 的 catch 方法，第二种用 try catch 关键字。
+</p>
+
+<p>
+	Promise catch
+</p>
+
+<div>
+	const fs = require('fs')<br/>
+	const co = require('co')<br/>
+	const readFile = util.promisify(fs.readFile)<br/>
+	co(function* () {<br/>
+	  const data = yield readFile('file.txt').catch(err => console.log(err))<br/>
+	})<br/>
+</div>
+
+<div>
+	const fs = require('fs')<br/>
+	const co = require('co')<br/>
+	const readFile = util.promisify(fs.readFile)<br/>
+	async function testRead() {<br/>
+	  const data = await readFile('file.txt').catch(err => console.log(err))<br/>
+	}<br/>
+</div>
+
+<p>
+	try/catch
+</p>
+
+<div>
+	const fs = require('fs')<br/>
+	const co = require('co')<br/>
+	const readFile = util.promisify(fs.readFile)<br/>
+	co(function* () {<br/>
+	  try {<br/>
+	    const data = yield readFile('file.txt')<br/>
+	  } catch(err) {<br/>
+	    console.log(err)<br/>
+	  }<br/>
+	})<br/>
+</div>
+
+<div>
+	const fs = require('fs')<br/>
+	const readFile = util.promisify(fs.readFile)<br/>
+	async function testRead() {<br/>
+	  try {<br/>
+	    const data = await readFile('file.txt')<br/>
+	  } catch(err) {<br/>
+	    console.log(data)<br/>
+	  }<br/>
+	}<br/>
+</div>
+
+</body>
+</html>
